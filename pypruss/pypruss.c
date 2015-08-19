@@ -167,7 +167,7 @@ static PyObject *pypruss_exec_program(PyObject *self, PyObject *args){
 
     prussdrv_exec_program (pru_num, filename);						// Load and execute the program 
 	
-	Py_INCREF(Py_None);
+    Py_INCREF(Py_None);
     return Py_None;
 }
  
@@ -176,8 +176,10 @@ static PyObject *pypruss_exec_program(PyObject *self, PyObject *args){
 static PyObject *pypruss_wait_for_event(PyObject *self, PyObject *args){
 	int evtout; // PRU_EVTOUT_0 or PRU_EVTOUT_1
     if (!PyArg_ParseTuple(args, "i", &evtout))
-     	return NULL;	
+     	return NULL;
+    Py_BEGIN_ALLOW_THREADS 	
 	prussdrv_pru_wait_event (evtout);			// Wait for the event. This blocks the thread. 
+    Py_END_ALLOW_THREADS
     Py_INCREF(Py_None);
     return Py_None;
 }
