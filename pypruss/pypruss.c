@@ -115,7 +115,7 @@ static PyObject *pypruss_map_prumem(PyObject *self, PyObject *args){
     return PyBuffer_FromReadWriteMemory(p, 8*1024);
 }
 
-// Write data to the memory
+// Write data to the memory (in ints)
 static PyObject *pypruss_pru_write_memory(PyObject *self, PyObject *args){
 	int mem_type;		// PRUSS0_PRU0_DATARAM or PRUSS0_PRU1_DATARAM
     int i;    
@@ -144,6 +144,37 @@ static PyObject *pypruss_pru_write_memory(PyObject *self, PyObject *args){
 
     Py_INCREF(Py_None);													
     return Py_None;	
+}
+
+// Write data to the memory (in bytes)
+static PyObject *pypruss_pru_write_memory_bytes(PyObject *self, PyObject *args){
+    int mem_type;              // PRUSS0_PRU0_DATARAM or PRUSS0_PRU1_DATARAM
+    int i;
+    int len;
+    int offset;
+    PyObject* data_obj;
+    PyObject* int_obj;
+    PyObject* data_seq;
+    unsigned char *data;
+
+    if (!PyArg_ParseTuple(args, "iiO", &mem_type, &offset, &data_obj))
+        return NULL;
+
+    data_seq = PySequence_Fast(data_obj, "expected a sequence");
+    len = PySequence_Size(data_obj);
+        data = (unsigned char *)calloc(len, 1);
+
+    for (i = 0; i < len; i++) {
+        int_obj = PySequence_Fast_GET_ITEM(data_seq, i);
+        data[i] = (char) PyInt_AsUnsignedLongMask(int_obj);
+    }
+    Py_DECREF(data_seq);
+
+
+    prussdrv_pru_write_memory(mem_type, offset, data, len);
+
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 // Interrupt init
@@ -250,18 +281,19 @@ static PyMethodDef pypruss_methods[] = {
         { "modunprobe", (PyCFunction)pypruss_modunprobe, METH_VARARGS, NULL },
         { "init", (PyCFunction)pypruss_init, METH_VARARGS, NULL },
         { "open", (PyCFunction)pypruss_open, METH_VARARGS, NULL },
-		{ "pru_reset", (PyCFunction)pypruss_pru_reset, METH_VARARGS, NULL},
-		{ "pru_disable", (PyCFunction)pypruss_pru_disable, METH_VARARGS, NULL},
-		{ "pru_enable", (PyCFunction)pypruss_pru_enable, METH_VARARGS, NULL},		
+        { "pru_reset", (PyCFunction)pypruss_pru_reset, METH_VARARGS, NULL},
+        { "pru_disable", (PyCFunction)pypruss_pru_disable, METH_VARARGS, NULL},
+        { "pru_enable", (PyCFunction)pypruss_pru_enable, METH_VARARGS, NULL},		
         { "map_prumem", (PyCFunction)pypruss_map_prumem, METH_VARARGS, NULL},
-		{ "pru_write_memory", (PyCFunction)pypruss_pru_write_memory, METH_VARARGS, NULL},
+        { "pru_write_memory", (PyCFunction)pypruss_pru_write_memory, METH_VARARGS, NULL},
+        { "pru_write_memory_bytes", (PyCFunction)pypruss_pru_write_memory_bytes, METH_VARARGS, NULL},
         { "pruintc_init", (PyCFunction)pypruss_pruintc_init, METH_VARARGS, NULL },
         { "exec_program", (PyCFunction)pypruss_exec_program, METH_VARARGS, NULL },
-		{ "wait_for_event", (PyCFunction)pypruss_wait_for_event, METH_VARARGS, NULL},
-		{ "clear_event", (PyCFunction)pypruss_clear_event, METH_VARARGS, NULL},		
-		{ "exit", (PyCFunction)pypruss_exit, METH_VARARGS, NULL},
-		{ "ddr_addr", (PyCFunction)pypruss_ddr_addr, METH_VARARGS, NULL},
-		{ "ddr_size", (PyCFunction)pypruss_ddr_size, METH_VARARGS, NULL},
+        { "wait_for_event", (PyCFunction)pypruss_wait_for_event, METH_VARARGS, NULL},
+        { "clear_event", (PyCFunction)pypruss_clear_event, METH_VARARGS, NULL},		
+        { "exit", (PyCFunction)pypruss_exit, METH_VARARGS, NULL},
+        { "ddr_addr", (PyCFunction)pypruss_ddr_addr, METH_VARARGS, NULL},
+        { "ddr_size", (PyCFunction)pypruss_ddr_size, METH_VARARGS, NULL},
         { NULL, NULL, 0, NULL }
 };
  
