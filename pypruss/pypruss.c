@@ -115,6 +115,18 @@ static PyObject *pypruss_map_prumem(PyObject *self, PyObject *args){
     return PyBuffer_FromReadWriteMemory(p,rc);
 }
 
+// Read from extmem
+static PyObject *pypruss_map_extmem(PyObject *self){
+    void *p;
+    int rc;
+
+    rc = prussdrv_map_extmem(&p);
+    if (rc < 0)
+        return NULL;
+
+    return PyBuffer_FromReadWriteMemory(p, rc);
+}
+
 // Write data to the memory (in ints)
 static PyObject *pypruss_pru_write_memory(PyObject *self, PyObject *args){
 	int mem_type;		// PRUSS0_PRU0_DATARAM or PRUSS0_PRU1_DATARAM
@@ -285,6 +297,7 @@ static PyMethodDef pypruss_methods[] = {
         { "pru_disable", (PyCFunction)pypruss_pru_disable, METH_VARARGS, NULL},
         { "pru_enable", (PyCFunction)pypruss_pru_enable, METH_VARARGS, NULL},		
         { "map_prumem", (PyCFunction)pypruss_map_prumem, METH_VARARGS, NULL},
+        { "map_extmem", (PyCFunction)pypruss_map_extmem, METH_VARARGS, NULL},
         { "pru_write_memory", (PyCFunction)pypruss_pru_write_memory, METH_VARARGS, NULL},
         { "pru_write_memory_bytes", (PyCFunction)pypruss_pru_write_memory_bytes, METH_VARARGS, NULL},
         { "pruintc_init", (PyCFunction)pypruss_pruintc_init, METH_VARARGS, NULL },
