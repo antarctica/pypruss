@@ -108,11 +108,11 @@ static PyObject *pypruss_map_prumem(PyObject *self, PyObject *args){
         return NULL;
     
     rc = prussdrv_map_prumem(mem_type, &p);
-    if (rc)
+    if (rc < 0)
         return NULL;
 
     // FIXME: This is wrong for shared data areas and v1 devices
-    return PyBuffer_FromReadWriteMemory(p, 8*1024);
+    return PyBuffer_FromReadWriteMemory(p,rc);
 }
 
 // Write data to the memory (in ints)

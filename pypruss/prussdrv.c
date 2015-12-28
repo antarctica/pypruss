@@ -453,7 +453,7 @@ int prussdrv_pru_send_wait_clear_event(unsigned int send_eventnum,
 int prussdrv_map_l3mem(void **address)
 {
     *address = prussdrv.l3ram_base;
-    return 0;
+    return prussdrv.l3ram_map_size;
 }
 
 
@@ -462,7 +462,7 @@ int prussdrv_map_extmem(void **address)
 {
 
     *address = prussdrv.extram_base;
-    return 0;
+    return prussdrv.extram_map_size;
 
 }
 
@@ -485,7 +485,7 @@ int prussdrv_map_prumem(unsigned int pru_ram_id, void **address)
         *address = 0;
         return -1;
     }
-    return 0;
+    return prussdrv.pruss_map_size;
 }
 
 int prussdrv_map_peripheral_io(unsigned int per_id, void **address)
