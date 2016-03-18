@@ -253,8 +253,7 @@ static PyObject *pypruss_ddr_addr(PyObject *self, PyObject *args){
 	fd = open ("/sys/class/uio/uio0/maps/map1/addr", O_RDONLY, S_IREAD);
 	if (fd){
 		read(fd, hex, 11);
-		fprintf(stderr, "DDR addr is: 0x%s\n", hex);
-        addr = strtoul(hex, NULL, 16);
+                addr = strtoul(hex, NULL, 16);
         close(fd);    	
   	}
 	else{
